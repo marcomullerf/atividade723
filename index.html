@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Simulador Didático de Chat - Orçamento</title>
+  <title>Simulador Didático de Chat - Orçamento Escolar</title>
 
-  <!-- Biblioteca para capturar a tela do chat -->
+  <!-- Biblioteca html2canvas para captura da imagem do chat -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
   <style>
@@ -13,7 +13,7 @@
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: Segoe UI, Helvetica Neue, Helvetica, Arial, sans-serif;
+      font-family: 'Segoe UI', system-ui, -apple-system, Helvetica, Arial, sans-serif;
     }
     
     body {
@@ -21,58 +21,62 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start;
       min-height: 100vh;
-      padding: 10px;
+      padding: 12px;
     }
 
-    /* Banner Didático */
+    /* Banner Didático Superior */
     .banner-didatico {
       width: 100%;
       max-width: 600px;
       background-color: #fff3cd;
       color: #856404;
       border: 1px solid #ffeeba;
-      border-radius: 8px;
-      padding: 10px 15px;
-      margin-bottom: 10px;
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin-bottom: 12px;
       text-align: center;
       font-size: 13px;
-      line-height: 1.4;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      line-height: 1.45;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
     }
     .banner-didatico strong {
       display: block;
       font-size: 14px;
-      margin-bottom: 2px;
+      margin-bottom: 3px;
       color: #634a00;
+      letter-spacing: 0.3px;
     }
 
-    /* Chat Responsivo */
+    /* Chat Container Estilo WhatsApp */
     .chat-container {
       width: 100%;
       max-width: 600px;
-      height: 75vh;
+      height: 68vh;
+      min-height: 420px;
       background-color: #efeae2;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      border-radius: 12px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.15);
       overflow: hidden;
       display: flex;
       flex-direction: column;
     }
 
+    /* Cabeçalho do Chat */
     .chat-header {
       background-color: #075e54;
       color: white;
-      padding: 12px 15px;
+      padding: 12px 16px;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
       flex-shrink: 0;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
     .chat-header .avatar {
-      width: 38px;
-      height: 38px;
+      width: 40px;
+      height: 40px;
       background-color: #25d366;
       border-radius: 50%;
       display: flex;
@@ -80,104 +84,140 @@
       justify-content: center;
       font-weight: bold;
       color: white;
-      font-size: 18px;
+      font-size: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
     }
     .chat-header .title-group {
       display: flex;
       flex-direction: column;
     }
     .chat-header .title {
-      font-weight: bold;
+      font-weight: 600;
       font-size: 15px;
     }
     .chat-header .subtitle {
-      font-size: 11px;
+      font-size: 12px;
       opacity: 0.85;
     }
 
+    /* Barra de Dicas de Formatação */
     .instructions {
       background-color: #ffffff;
-      padding: 8px 12px;
+      padding: 8px 14px;
       font-size: 12px;
-      color: #555;
-      border-bottom: 1px solid #ddd;
+      color: #4a5568;
+      border-bottom: 1px solid #e2e8f0;
       flex-shrink: 0;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .instructions code {
+      background: #edf2f7;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 11px;
     }
 
+    /* Histórico de Mensagens */
     .chat-messages {
       flex: 1;
-      padding: 15px;
+      padding: 16px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
       gap: 10px;
+      background-image: radial-gradient(#d1d5db 1px, transparent 1px);
+      background-size: 16px 16px;
     }
 
     .message {
       max-width: 85%;
-      padding: 8px 12px;
-      border-radius: 7.5px;
+      padding: 9px 13px;
+      border-radius: 8px;
       font-size: 14px;
-      line-height: 1.4;
+      line-height: 1.45;
       position: relative;
       word-wrap: break-word;
       white-space: pre-wrap;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
     }
     .message.received {
       background-color: #ffffff;
       align-self: flex-start;
-      border-top-left-radius: 0;
+      border-top-left-radius: 2px;
+      color: #1a202c;
     }
     .message.sent {
       background-color: #dcf8c6;
       align-self: flex-end;
-      border-top-right-radius: 0;
+      border-top-right-radius: 2px;
+      color: #0f2d1e;
     }
 
-    /* Caixa de entrada expansível */
+    /* Área do Input */
     .chat-input-area {
-      padding: 10px;
-      background-color: #f0f0f0;
+      padding: 10px 12px;
+      background-color: #f0f2f5;
       display: flex;
       gap: 8px;
       align-items: flex-end;
       flex-shrink: 0;
+      border-top: 1px solid #e2e8f0;
     }
 
     .chat-input-area textarea {
       flex: 1;
       padding: 10px 14px;
-      border: 1px solid #ccc;
-      border-radius: 18px;
+      border: 1px solid #cbd5e0;
+      border-radius: 20px;
       outline: none;
       font-size: 14px;
       resize: none;
-      max-height: 140px;
-      min-height: 40px;
-      line-height: 1.3;
+      max-height: 120px;
+      min-height: 42px;
+      line-height: 1.35;
       font-family: inherit;
+      background-color: #ffffff;
+      transition: border-color 0.2s;
+    }
+    .chat-input-area textarea:focus {
+      border-color: #128c7e;
     }
 
     .chat-input-area button {
       background-color: #128c7e;
       color: white;
       border: none;
-      padding: 10px 16px;
+      padding: 0 18px;
       border-radius: 20px;
       cursor: pointer;
-      font-weight: bold;
+      font-weight: 600;
       font-size: 14px;
-      height: 40px;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      transition: background-color 0.2s, transform 0.1s;
+    }
+    .chat-input-area button:hover {
+      background-color: #075e54;
+    }
+    .chat-input-area button:active {
+      transform: scale(0.97);
     }
 
-    /* Botões Finais */
+    /* Rodapé de Ações do Aluno */
     .footer-actions {
       width: 100%;
       max-width: 600px;
-      margin-top: 10px;
+      margin-top: 12px;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 10px;
     }
 
     .student-info {
@@ -186,10 +226,15 @@
     }
     .student-info input {
       flex: 1;
-      padding: 8px 12px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid #cbd5e0;
       font-size: 13px;
+      outline: none;
+      background-color: #ffffff;
+    }
+    .student-info input:focus {
+      border-color: #075e54;
     }
 
     .btn-group {
@@ -203,23 +248,28 @@
       color: white;
       border: none;
       padding: 12px;
-      border-radius: 6px;
-      font-weight: bold;
+      border-radius: 8px;
+      font-weight: 600;
       font-size: 13px;
       cursor: pointer;
       text-align: center;
-      transition: background 0.2s;
+      transition: background-color 0.2s, transform 0.1s;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
     .btn-action.secondary {
       background-color: #128c7e;
     }
     .btn-action:hover {
-      opacity: 0.9;
+      opacity: 0.92;
+    }
+    .btn-action:active {
+      transform: scale(0.98);
     }
 
+    /* Adaptação Mobile */
     @media (max-width: 480px) {
-      body { padding: 5px; }
-      .chat-container { height: 70vh; }
+      body { padding: 8px; }
+      .chat-container { height: 65vh; min-height: 380px; }
       .student-info { flex-direction: column; }
       .btn-group { flex-direction: column; }
     }
@@ -230,11 +280,11 @@
   <!-- Banner didático -->
   <div class="banner-didatico">
     <strong>🎓 PLATAFORMA DE USO DIDÁTICO</strong>
-    Ambiente de simulação para elaboração de orçamentos escolares.<br>
-    Destinatário pedagógico: Prof. Marco Müller (marco-filho4@educar.rs.gov.br).
+    Ambiente de simulação pedagógica para elaboração de orçamentos escolares.<br>
+    Orientador responsável: Prof. Marco Müller (marco-filho4@educar.rs.gov.br).
   </div>
 
-  <!-- Chat -->
+  <!-- Chat Container -->
   <div class="chat-container" id="chatToCapture">
     <div class="chat-header">
       <div class="avatar">📊</div>
@@ -245,12 +295,15 @@
     </div>
 
     <div class="instructions">
-      <b>Formatação:</b> <code>*negrito*</code> | <code>_itálico_</code> | <code>~riscado~</code>
+      <span><b>Formatação:</b></span>
+      <code>*negrito*</code>
+      <code>_itálico_</code>
+      <code>~riscado~</code>
     </div>
 
     <div class="chat-messages" id="chatMessages">
       <div class="message received">
-        <b>Professor:</b> Olá! Utilize este chat para simular a proposta do seu orçamento. Digite as mensagens necessárias abaixo.
+        <b>Professor Marco:</b> Olá! Utilize este chat para apresentar a proposta do seu orçamento. Digite as mensagens e os valores organizados abaixo.
       </div>
     </div>
 
@@ -260,11 +313,11 @@
     </div>
   </div>
 
-  <!-- Controles de Envio -->
+  <!-- Controles de Aluno e Exportação -->
   <div class="footer-actions">
     <div class="student-info">
       <input type="text" id="studentName" placeholder="Seu Nome Completo (obrigatório)">
-      <input type="text" id="studentClass" placeholder="Turma/Disciplina (opcional)">
+      <input type="text" id="studentClass" placeholder="Turma / Disciplina (opcional)">
     </div>
     
     <div class="btn-group">
@@ -278,11 +331,20 @@
   </div>
 
   <script>
+    // Detecção de Dispositivo Móvel (Smartphones/Tablets)
+    function isMobileDevice() {
+      const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+      const isTouchScreen = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+      return /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent) || isTouchScreen;
+    }
+
+    // Ajuste dinâmico da altura da caixa de entrada
     function autoGrow(element) {
-      element.style.height = "40px";
+      element.style.height = "42px";
       element.style.height = (element.scrollHeight) + "px";
     }
 
+    // Interpretador de formatação estilo WhatsApp
     function parseFormatting(text) {
       return text
         .replace(/\*(.*?)\*/g, '<b>$1</b>')
@@ -290,6 +352,7 @@
         .replace(/~(.*?)~/g, '<del>$1</del>');
     }
 
+    // Envio da mensagem para o histórico
     function sendMessage() {
       const input = document.getElementById('userInput');
       const text = input.value.trim();
@@ -304,29 +367,40 @@
       chatMessages.scrollTop = chatMessages.scrollHeight;
       
       input.value = '';
-      input.style.height = '40px'; // Reseta a altura da caixa de texto
+      input.style.height = '42px';
     }
 
-    // Gerenciador do Teclado:
-    // Enter -> Envia a mensagem (cancela a quebra padrão)
-    // Shift + Enter -> Quebra a linha normalmente
+    // Tratamento Teclado (Desktop vs Mobile)
     const textarea = document.getElementById('userInput');
     textarea.addEventListener('keydown', function(event) {
       if (event.key === 'Enter') {
-        if (!event.shiftKey) {
-          event.preventDefault(); // Impede de criar nova linha ao dar Enter simples
-          sendMessage();
+        if (isMobileDevice()) {
+          // NO CELULAR: Tecla de Retorno/Enter do teclado virtual insere quebra de linha.
+          // O envio ocorre estritamente pelo botão "Enviar".
+          return;
+        } else {
+          // NO DESKTOP:
+          // Enter sem Shift -> Envia a mensagem
+          // Shift + Enter -> Insere quebra de linha
+          if (!event.shiftKey) {
+            event.preventDefault();
+            sendMessage();
+          }
         }
       }
     });
 
-    // Função para gerar a imagem a partir do HTML do Chat
+    // Função para gerar o canvas do chat com html2canvas
     async function generateCanvas() {
       const chatElement = document.getElementById('chatToCapture');
-      return await html2canvas(chatElement, { scale: 2 });
+      return await html2canvas(chatElement, { 
+        scale: 2,
+        useCORS: true,
+        backgroundColor: '#efeae2'
+      });
     }
 
-    // Método 1: Compartilhamento / Envio Nativo
+    // Compartilhamento/Envio Nativo ou por E-mail
     async function shareOrSend() {
       const studentName = document.getElementById('studentName').value.trim();
       const studentClass = document.getElementById('studentClass').value.trim();
@@ -339,16 +413,24 @@
       try {
         const canvas = await generateCanvas();
         canvas.toBlob(async (blob) => {
-          const file = new File([blob], `Orcamento_${studentName.replace(/\s+/g, '_')}.png`, { type: "image/png" });
+          if (!blob) {
+            alert('Não foi possível gerar a imagem.');
+            return;
+          }
 
+          const fileName = `Orcamento_${studentName.replace(/\s+/g, '_')}.png`;
+          const file = new File([blob], fileName, { type: "image/png" });
+
+          // Tenta usar a Web Share API (Nativa em smartphones)
           if (navigator.canShare && navigator.canShare({ files: [file] })) {
             await navigator.share({
-              title: 'Orçamento - Atividade Didática',
+              title: 'Orçamento Escolar - Atividade Didática',
               text: `Orçamento enviado por: ${studentName} (${studentClass}) ao Prof. Marco Filho.`,
               files: [file]
             });
           } else {
-            const mailtoUrl = `mailto:marco-filho4@educar.rs.gov.br?subject=${encodeURIComponent("Orçamento Didático: " + studentName + " - " + studentClass)}&body=${encodeURIComponent("Olá Professor Marco,\n\nSegue em anexo a imagem do orçamento elaborado na simulação por: " + studentName + " (" + studentClass + ").\n\n(A imagem do orçamento foi baixada automaticamente em seu dispositivo, basta anexá-la a este e-mail).")}`;
+            // Fallback para e-mail + Download do Print
+            const mailtoUrl = `mailto:marco-filho4@educar.rs.gov.br?subject=${encodeURIComponent("Orçamento Didático: " + studentName + " - " + studentClass)}&body=${encodeURIComponent("Olá Professor Marco,\n\nSegue em anexo a proposta do orçamento elaborado por: " + studentName + " (" + studentClass + ").\n\n(A imagem do orçamento foi salva em seu dispositivo para anexar a este e-mail).")}`;
             
             downloadImage();
             window.location.href = mailtoUrl;
@@ -357,11 +439,11 @@
 
       } catch (err) {
         console.error(err);
-        alert('Ocorreu um erro ao gerar a captura. Tente a opção "Baixar Print da Mensagem".');
+        alert('Ocorreu um erro ao gerar a captura. Utilize a opção "Baixar Print da Mensagem".');
       }
     }
 
-    // Método 2: Baixar a imagem PNG do chat
+    // Download Direto da Imagem PNG
     async function downloadImage() {
       const studentName = document.getElementById('studentName').value.trim() || 'Aluno';
       
