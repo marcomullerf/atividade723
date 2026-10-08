@@ -152,7 +152,7 @@
       outline: none;
       font-size: 14px;
       resize: none;
-      max-height: 120px;
+      max-height: 140px;
       min-height: 40px;
       line-height: 1.3;
       font-family: inherit;
@@ -231,7 +231,7 @@
   <div class="banner-didatico">
     <strong>🎓 PLATAFORMA DE USO DIDÁTICO</strong>
     Ambiente de simulação para elaboração de orçamentos escolares.<br>
-    Destinatário pedagógico: Prof. Marco Müller (marco-filho4@educar.rs.gov.br).
+    Destinatário pedagógico: Prof. Marco Filho (marco-filho4@educar.rs.gov.br).
   </div>
 
   <!-- Chat -->
@@ -307,20 +307,13 @@
       input.style.height = '40px';
     }
 
-    document.getElementById('userInput').addEventListener('keydown', function(e) {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        sendMessage();
-      }
-    });
-
     // Função para gerar a imagem a partir do HTML do Chat
     async function generateCanvas() {
       const chatElement = document.getElementById('chatToCapture');
       return await html2canvas(chatElement, { scale: 2 });
     }
 
-    // Método 1: Compartilhamento / Envio Nativo (Abre o App de E-mail/WhatsApp do celular ou PC)
+    // Método 1: Compartilhamento / Envio Nativo
     async function shareOrSend() {
       const studentName = document.getElementById('studentName').value.trim();
       const studentClass = document.getElementById('studentClass').value.trim();
@@ -335,7 +328,6 @@
         canvas.toBlob(async (blob) => {
           const file = new File([blob], `Orcamento_${studentName.replace(/\s+/g, '_')}.png`, { type: "image/png" });
 
-          // Se o dispositivo do aluno suporta compartilhamento direto de arquivos (Smartphones e navegadores modernos)
           if (navigator.canShare && navigator.canShare({ files: [file] })) {
             await navigator.share({
               title: 'Orçamento - Atividade Didática',
@@ -343,13 +335,9 @@
               files: [file]
             });
           } else {
-            // Caso seja um PC antigo sem menu de compartilhamento, abre o aplicativo de e-mail e baixa a imagem
             const mailtoUrl = `mailto:marco-filho4@educar.rs.gov.br?subject=${encodeURIComponent("Orçamento Didático: " + studentName + " - " + studentClass)}&body=${encodeURIComponent("Olá Professor Marco,\n\nSegue em anexo a imagem do orçamento elaborado na simulação por: " + studentName + " (" + studentClass + ").\n\n(A imagem do orçamento foi baixada automaticamente em seu dispositivo, basta anexá-la a este e-mail).")}`;
             
-            // Baixa a imagem
             downloadImage();
-            
-            // Abre o e-mail pré-preenchido
             window.location.href = mailtoUrl;
           }
         }, 'image/png');
@@ -360,7 +348,7 @@
       }
     }
 
-    // Método 2: Baixar a imagem PNG do chat diretamente
+    // Método 2: Baixar a imagem PNG do chat
     async function downloadImage() {
       const studentName = document.getElementById('studentName').value.trim() || 'Aluno';
       
