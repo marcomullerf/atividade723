@@ -316,10 +316,14 @@
       // SUBSTÍTUO DA CHAVE DO WEB3FORMS
       const WEB3FORMS_ACCESS_KEY = "dbe60c02-f525-4a33-ba72-cc9767828131"; 
 
-      if (WEB3FORMS_ACCESS_KEY === "dbe60c02-f525-4a33-ba72-cc9767828131") {
-        alert("Atenção: É necessário configurar a chave do Web3Forms no código para receber as mensagens por e-mail.");
-        return;
-      }
+    // CHAVE DO WEB3FORMS
+const WEB3FORMS_ACCESS_KEY = "dbe60c02-f525-4a33-ba72-cc9767828131"; 
+
+// Trava de segurança: só avisa se o código AINDA estiver com o texto padrão
+if (WEB3FORMS_ACCESS_KEY === "SUA_CHAVE_AQUI") {
+  alert("Atenção: É necessário configurar a chave do Web3Forms no código para receber as mensagens por e-mail.");
+  return;
+}
 
       sendBtn.disabled = true;
       sendBtn.innerText = "Gerando imagem e enviando...";
