@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulador Didático de Chat - Orçamento</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Segoe UI, Helvetica Neue, Helvetica, Arial, sans-serif;
+    }
+    body {
+      background-color: #d1dbe1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    /* Banner didático */
+    .banner-didatico {
+      width: 100%;
+      max-width: 450px;
+      background-color: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffeeba;
+      border-radius: 8px;
+      padding: 12px 15px;
+      margin-bottom: 12px;
+      text-align: center;
+      font-size: 13px;
+      line-height: 1.4;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+    }
+    .banner-didatico strong {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 4px;
+      color: #634a00;
+    }
+
+    .chat-container {
+      width: 100%;
+      max-width: 450px;
+      background-color: #efeae2;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 80vh;
+    }
+    .chat-header {
+      background-color: #075e54;
+      color: white;
+      padding: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .chat-header .avatar {
+      width: 40px;
+      height: 40px;
+      background-color: #25d366;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: white;
+      font-size: 18px;
+    }
+    .chat-header .title-group {
+      display: flex;
+      flex-direction: column;
+    }
+    .chat-header .title {
+      font-weight: bold;
+      font-size: 16px;
+    }
+    .chat-header .subtitle {
+      font-size: 11px;
+      opacity: 0.85;
+    }
+    .instructions {
+      background-color: #ffffff;
+      padding: 10px 15px;
+      font-size: 12px;
+      color: #555;
+      border-bottom: 1px solid #ddd;
+    }
+    .chat-messages {
+      flex: 1;
+      padding: 15px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .message {
+      max-width: 85%;
+      padding: 8px 12px;
+      border-radius: 7.5px;
+      font-size: 14px;
+      line-height: 1.4;
+      position: relative;
+      word-wrap: break-word;
+    }
+    .message.received {
+      background-color: #ffffff;
+      align-self: flex-start;
+      border-top-left-radius: 0;
+    }
+    .message.sent {
+      background-color: #dcf8c6;
+      align-self: flex-end;
+      border-top-right-radius: 0;
+    }
+    .chat-input-area {
+      padding: 10px;
+      background-color: #f0f0f0;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .chat-input-area input {
+      flex: 1;
+      padding: 10px 14px;
+      border: 1px solid #ccc;
+      border-radius: 20px;
+      outline: none;
+      font-size: 14px;
+    }
+    .chat-input-area button {
+      background-color: #128c7e;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 14px;
+    }
+    .footer-note {
+      margin-top: 10px;
+      font-size: 11px;
+      color: #666;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Aviso de uso educacional/didático -->
+  <div class="banner-didatico">
+    <strong>🎓 PLATAFORMA DE USO DIDÁTICO</strong>
+    Ambiente de simulação para elaboração de orçamentos escolares.<br>
+    Destinatário pedagógico: Prof. Marco Filho (marco-filho4@educar.rs.gov.br).
+  </div>
+
+  <div class="chat-container">
+    <div class="chat-header">
+      <div class="avatar">📊</div>
+      <div class="title-group">
+        <div class="title">Simulador de Orçamento</div>
+        <div class="subtitle">Atividade Didática de Envio</div>
+      </div>
+    </div>
+
+    <div class="instructions">
+      <b>Formatação de texto:</b> <code>*negrito*</code> | <code>_itálico_</code> | <code>~riscado~</code>
+    </div>
+
+    <div class="chat-messages" id="chatMessages">
+      <div class="message received">
+        <b>Professor:</b> Olá! Utilize este chat para simular a proposta do seu orçamento. Digite as mensagens necessárias abaixo.
+      </div>
+    </div>
+
+    <div class="chat-input-area">
+      <input type="text" id="userInput" placeholder="Digite uma mensagem do orçamento..." onkeypress="handleKeyPress(event)">
+      <button onclick="sendMessage()">Enviar</button>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    Ao concluir a simulação, tire um print da tela e envie ao professor.
+  </div>
+
+  <script>
+    function parseFormatting(text) {
+      return text
+        .replace(/\*(.*?)\*/g, '<b>$1</b>')
+        .replace(/_(.*?)_/g, '<i>$1</i>')
+        .replace(/~(.*?)~/g, '<del>$1</del>');
+    }
+
+    function sendMessage() {
+      const input = document.getElementById('userInput');
+      const text = input.value.trim();
+      if (text === '') return;
+
+      const chatMessages = document.getElementById('chatMessages');
+      const newMessage = document.createElement('div');
+      newMessage.className = 'message sent';
+      newMessage.innerHTML = parseFormatting(text);
+
+      chatMessages.appendChild(newMessage);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+      input.value = '';
+    }
+
+    function handleKeyPress(event) {
+      if (event.key === 'Enter') {
+        sendMessage();
+      }
+    }
+  </script>
+
+</body>
+</html>
