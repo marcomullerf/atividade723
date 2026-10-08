@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Simulador Didático de Chat - Orçamento</title>
 
-  <!-- Biblioteca para capturar a tela em imagem -->
+  <!-- Biblioteca para capturar a tela do chat -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
   <style>
@@ -26,7 +26,7 @@
       padding: 10px;
     }
 
-    /* Banner didático */
+    /* Banner Didático */
     .banner-didatico {
       width: 100%;
       max-width: 600px;
@@ -48,11 +48,11 @@
       color: #634a00;
     }
 
-    /* Layout Responsivo do Container do Chat */
+    /* Chat Responsivo */
     .chat-container {
       width: 100%;
       max-width: 600px;
-      height: 80vh;
+      height: 75vh;
       background-color: #efeae2;
       border-radius: 10px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.15);
@@ -134,7 +134,7 @@
       border-top-right-radius: 0;
     }
 
-    /* Área de Entrada do Chat */
+    /* Caixa de entrada expansível */
     .chat-input-area {
       padding: 10px;
       background-color: #f0f0f0;
@@ -170,7 +170,7 @@
       height: 40px;
     }
 
-    /* Rodapé */
+    /* Botões Finais */
     .footer-actions {
       width: 100%;
       max-width: 600px;
@@ -192,30 +192,36 @@
       font-size: 13px;
     }
 
-    .btn-send-prof {
+    .btn-group {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-action {
+      flex: 1;
       background-color: #075e54;
       color: white;
       border: none;
       padding: 12px;
       border-radius: 6px;
       font-weight: bold;
-      font-size: 14px;
+      font-size: 13px;
       cursor: pointer;
       text-align: center;
       transition: background 0.2s;
     }
-    .btn-send-prof:hover {
-      background-color: #054840;
+    .btn-action.secondary {
+      background-color: #128c7e;
     }
-    .btn-send-prof:disabled {
-      background-color: #8fa8a3;
-      cursor: not-allowed;
+    .btn-action:hover {
+      opacity: 0.9;
     }
 
     @media (max-width: 480px) {
       body { padding: 5px; }
-      .chat-container { height: 75vh; }
+      .chat-container { height: 70vh; }
       .student-info { flex-direction: column; }
+      .btn-group { flex-direction: column; }
     }
   </style>
 </head>
@@ -254,16 +260,21 @@
     </div>
   </div>
 
-  <!-- Controles de envio -->
+  <!-- Controles de Envio -->
   <div class="footer-actions">
     <div class="student-info">
       <input type="text" id="studentName" placeholder="Seu Nome Completo (obrigatório)">
       <input type="text" id="studentClass" placeholder="Turma/Disciplina (opcional)">
     </div>
     
-    <button class="btn-send-prof" id="sendBtn" onclick="sendToProfessor()">
-      ✉️ Salvar Mensagens e Enviar ao Professor
-    </button>
+    <div class="btn-group">
+      <button class="btn-action" id="shareBtn" onclick="shareOrSend()">
+        📱 Enviar / Compartilhar
+      </button>
+      <button class="btn-action secondary" onclick="downloadImage()">
+        💾 Baixar Print da Mensagem
+      </button>
+    </div>
   </div>
 
   <script>
@@ -303,79 +314,65 @@
       }
     });
 
-    async function sendToProfessor() {
+    // Função para gerar a imagem a partir do HTML do Chat
+    async function generateCanvas() {
+      const chatElement = document.getElementById('chatToCapture');
+      return await html2canvas(chatElement, { scale: 2 });
+    }
+
+    // Método 1: Compartilhamento / Envio Nativo (Abre o App de E-mail/WhatsApp do celular ou PC)
+    async function shareOrSend() {
       const studentName = document.getElementById('studentName').value.trim();
       const studentClass = document.getElementById('studentClass').value.trim();
-      const sendBtn = document.getElementById('sendBtn');
 
       if (!studentName) {
         alert('Por favor, preencha seu nome completo antes de enviar.');
         return;
       }
 
-      // SUBSTÍTUO DA CHAVE DO WEB3FORMS
-      const WEB3FORMS_ACCESS_KEY = "dbe60c02-f525-4a33-ba72-cc9767828131"; 
-
-    // CHAVE DO WEB3FORMS
-const WEB3FORMS_ACCESS_KEY = "dbe60c02-f525-4a33-ba72-cc9767828131"; 
-
-// Trava de segurança: só avisa se o código AINDA estiver com o texto padrão
-if (WEB3FORMS_ACCESS_KEY === "SUA_CHAVE_AQUI") {
-  alert("Atenção: É necessário configurar a chave do Web3Forms no código para receber as mensagens por e-mail.");
-  return;
-}
-
-      sendBtn.disabled = true;
-      sendBtn.innerText = "Gerando imagem e enviando...";
-
       try {
-        const chatElement = document.getElementById('chatToCapture');
-        
-        // Gera a imagem do chat
-        const canvas = await html2canvas(chatElement, { scale: 1.5 });
-        
-        // Converte o Canvas em um arquivo Blob real (PNG)
-        canvas.toBlob(async function(blob) {
-          if (!blob) {
-            alert("Erro ao processar a captura de tela.");
-            sendBtn.disabled = false;
-            sendBtn.innerText = "✉️ Salvar Mensagens e Enviar ao Professor";
-            return;
-          }
-
+        const canvas = await generateCanvas();
+        canvas.toBlob(async (blob) => {
           const file = new File([blob], `Orcamento_${studentName.replace(/\s+/g, '_')}.png`, { type: "image/png" });
 
-          const formData = new FormData();
-          formData.append("access_key", WEB3FORMS_ACCESS_KEY);
-          formData.append("subject", `Orçamento Didático: ${studentName} - ${studentClass}`);
-          formData.append("from_name", studentName);
-          formData.append("name", studentName);
-          formData.append("message", `Atividade enviada por: ${studentName}\nTurma/Disciplina: ${studentClass}`);
-          formData.append("attachment", file); // Anexa o arquivo PNG compilado
-
-          const response = await fetch("https://api.web3forms.com/submit", {
-            method: "POST",
-            body: formData
-          });
-
-          const result = await response.json();
-
-          if (result.success) {
-            alert('Orçamento enviado com sucesso para o e-mail do professor!');
+          // Se o dispositivo do aluno suporta compartilhamento direto de arquivos (Smartphones e navegadores modernos)
+          if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            await navigator.share({
+              title: 'Orçamento - Atividade Didática',
+              text: `Orçamento enviado por: ${studentName} (${studentClass}) ao Prof. Marco Filho.`,
+              files: [file]
+            });
           } else {
-            console.error(result);
-            alert('Erro no envio: ' + (result.message || 'Verifique sua chave do Web3Forms.'));
+            // Caso seja um PC antigo sem menu de compartilhamento, abre o aplicativo de e-mail e baixa a imagem
+            const mailtoUrl = `mailto:marco-filho4@educar.rs.gov.br?subject=${encodeURIComponent("Orçamento Didático: " + studentName + " - " + studentClass)}&body=${encodeURIComponent("Olá Professor Marco,\n\nSegue em anexo a imagem do orçamento elaborado na simulação por: " + studentName + " (" + studentClass + ").\n\n(A imagem do orçamento foi baixada automaticamente em seu dispositivo, basta anexá-la a este e-mail).")}`;
+            
+            // Baixa a imagem
+            downloadImage();
+            
+            // Abre o e-mail pré-preenchido
+            window.location.href = mailtoUrl;
           }
-
-          sendBtn.disabled = false;
-          sendBtn.innerText = "✉️ Salvar Mensagens e Enviar ao Professor";
         }, 'image/png');
 
-      } catch (error) {
-        console.error(error);
-        alert('Ocorreu um erro ao gerar a captura de tela.');
-        sendBtn.disabled = false;
-        sendBtn.innerText = "✉️ Salvar Mensagens e Enviar ao Professor";
+      } catch (err) {
+        console.error(err);
+        alert('Ocorreu um erro ao gerar a captura. Tente a opção "Baixar Print da Mensagem".');
+      }
+    }
+
+    // Método 2: Baixar a imagem PNG do chat diretamente
+    async function downloadImage() {
+      const studentName = document.getElementById('studentName').value.trim() || 'Aluno';
+      
+      try {
+        const canvas = await generateCanvas();
+        const link = document.createElement('a');
+        link.download = `Orcamento_${studentName.replace(/\s+/g, '_')}.png`;
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      } catch (err) {
+        console.error(err);
+        alert('Erro ao baixar a imagem.');
       }
     }
   </script>
