@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Simulador Didático de Chat - Orçamento Escolar</title>
 
-  <!-- Biblioteca html2canvas para captura da imagem do chat -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
   <style>
@@ -49,7 +48,6 @@
       letter-spacing: 0.3px;
     }
 
-    /* Chat Container Estilo WhatsApp */
     .chat-container {
       width: 100%;
       max-width: 600px;
@@ -100,7 +98,7 @@
       opacity: 0.85;
     }
 
-    /* Barra de Dicas de Formatação */
+    /* Dicas de Formatação */
     .instructions {
       background-color: #ffffff;
       padding: 8px 14px;
@@ -121,7 +119,6 @@
       font-size: 11px;
     }
 
-    /* Histórico de Mensagens */
     .chat-messages {
       flex: 1;
       padding: 16px;
@@ -129,6 +126,7 @@
       display: flex;
       flex-direction: column;
       gap: 10px;
+      background-color: #efeae2;
       background-image: radial-gradient(#d1d5db 1px, transparent 1px);
       background-size: 16px 16px;
     }
@@ -266,7 +264,6 @@
       transform: scale(0.98);
     }
 
-    /* Adaptação Mobile */
     @media (max-width: 480px) {
       body { padding: 8px; }
       .chat-container { height: 65vh; min-height: 380px; }
@@ -281,7 +278,7 @@
   <div class="banner-didatico">
     <strong>🎓 PLATAFORMA DE USO DIDÁTICO</strong>
     Ambiente de simulação pedagógica para elaboração de orçamentos escolares.<br>
-    Orientador responsável: Prof. Marco Müller (marco-filho4@educar.rs.gov.br).
+    Orientador responsável: Prof. Marco Filho (marco-filho4@educar.rs.gov.br).
   </div>
 
   <!-- Chat Container -->
@@ -331,20 +328,17 @@
   </div>
 
   <script>
-    // Detecção de Dispositivo Móvel (Smartphones/Tablets)
     function isMobileDevice() {
       const userAgent = navigator.userAgent || navigator.vendor || window.opera;
       const isTouchScreen = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
       return /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent) || isTouchScreen;
     }
 
-    // Ajuste dinâmico da altura da caixa de entrada
     function autoGrow(element) {
       element.style.height = "42px";
       element.style.height = (element.scrollHeight) + "px";
     }
 
-    // Interpretador de formatação estilo WhatsApp
     function parseFormatting(text) {
       return text
         .replace(/\*(.*?)\*/g, '<b>$1</b>')
@@ -352,7 +346,6 @@
         .replace(/~(.*?)~/g, '<del>$1</del>');
     }
 
-    // Envio da mensagem para o histórico
     function sendMessage() {
       const input = document.getElementById('userInput');
       const text = input.value.trim();
@@ -370,18 +363,13 @@
       input.style.height = '42px';
     }
 
-    // Tratamento Teclado (Desktop vs Mobile)
+    // Teclado: Celular (Enter quebra linha) vs Desktop (Enter envia, Shift+Enter quebra linha)
     const textarea = document.getElementById('userInput');
     textarea.addEventListener('keydown', function(event) {
       if (event.key === 'Enter') {
         if (isMobileDevice()) {
-          // NO CELULAR: Tecla de Retorno/Enter do teclado virtual insere quebra de linha.
-          // O envio ocorre estritamente pelo botão "Enviar".
           return;
         } else {
-          // NO DESKTOP:
-          // Enter sem Shift -> Envia a mensagem
-          // Shift + Enter -> Insere quebra de linha
           if (!event.shiftKey) {
             event.preventDefault();
             sendMessage();
@@ -390,17 +378,49 @@
       }
     });
 
-    // Função para gerar o canvas do chat com html2canvas
     async function generateCanvas() {
-      const chatElement = document.getElementById('chatToCapture');
-      return await html2canvas(chatElement, { 
-        scale: 2,
-        useCORS: true,
-        backgroundColor: '#efeae2'
-      });
+      const chatContainer = document.getElementById('chatToCapture');
+      const chatMessages = document.getElementById('chatMessages');
+
+      // Guarda as propriedades originais do layout
+      const origContainerHeight = chatContainer.style.height;
+      const origContainerMinHeight = chatContainer.style.minHeight;
+      const origMessagesOverflow = chatMessages.style.overflow;
+      const origMessagesHeight = chatMessages.style.height;
+
+      try {
+        // Expande o container e a área de mensagens para exibir TODO o conteúdo sem barra de rolagem
+        chatMessages.style.overflow = 'visible';
+        chatMessages.style.height = 'auto';
+
+        chatContainer.style.height = 'auto';
+        chatContainer.style.minHeight = '0';
+
+        // Garante a renderização completa de todos os elementos
+        await new Promise(resolve => setTimeout(resolve, 50));
+
+        // Executa a captura do canvas com toda a extensão visível
+        const canvas = await html2canvas(chatContainer, {
+          scale: 2,
+          useCORS: true,
+          backgroundColor: '#efeae2',
+          windowHeight: chatContainer.scrollHeight,
+          scrollY: 0
+        });
+
+        return canvas;
+      } finally {
+        // Restaura as propriedades do chat ao estado original com rolagem funcional
+        chatContainer.style.height = origContainerHeight;
+        chatContainer.style.minHeight = origContainerMinHeight;
+        chatMessages.style.overflow = origMessagesOverflow;
+        chatMessages.style.height = origMessagesHeight;
+
+        // Garante que a rolagem retorne ao final da conversa
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
     }
 
-    // Compartilhamento/Envio Nativo ou por E-mail
     async function shareOrSend() {
       const studentName = document.getElementById('studentName').value.trim();
       const studentClass = document.getElementById('studentClass').value.trim();
@@ -421,7 +441,6 @@
           const fileName = `Orcamento_${studentName.replace(/\s+/g, '_')}.png`;
           const file = new File([blob], fileName, { type: "image/png" });
 
-          // Tenta usar a Web Share API (Nativa em smartphones)
           if (navigator.canShare && navigator.canShare({ files: [file] })) {
             await navigator.share({
               title: 'Orçamento Escolar - Atividade Didática',
@@ -429,7 +448,6 @@
               files: [file]
             });
           } else {
-            // Fallback para e-mail + Download do Print
             const mailtoUrl = `mailto:marco-filho4@educar.rs.gov.br?subject=${encodeURIComponent("Orçamento Didático: " + studentName + " - " + studentClass)}&body=${encodeURIComponent("Olá Professor Marco,\n\nSegue em anexo a proposta do orçamento elaborado por: " + studentName + " (" + studentClass + ").\n\n(A imagem do orçamento foi salva em seu dispositivo para anexar a este e-mail).")}`;
             
             downloadImage();
@@ -443,7 +461,6 @@
       }
     }
 
-    // Download Direto da Imagem PNG
     async function downloadImage() {
       const studentName = document.getElementById('studentName').value.trim() || 'Aluno';
       
